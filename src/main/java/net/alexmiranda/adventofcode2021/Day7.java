@@ -17,11 +17,27 @@ public class Day7 {
         return calculateFuelCost(crabs, alignPosition, Integer.MAX_VALUE);
     }
 
-    static int calculateFuelCost(int[] crabs, int alignPosition, int min) {
+    private static int calculateFuelCost(int[] crabs, int alignPosition, int min) {
         var totalCost = 0;
         for (int i = 0; i < crabs.length; i++) {
             totalCost += Math.abs(crabs[i] - alignPosition);
-            if (totalCost > min) {
+            if (totalCost >= min) {
+                return Integer.MAX_VALUE;
+            }
+        }
+        return totalCost;
+    }
+
+    static int calculateFuelCostRevised(int[] crabs, int alignPosition) {
+        return calculateFuelCostRevised(crabs, alignPosition, Integer.MAX_VALUE);
+    }
+
+    private static int calculateFuelCostRevised(int[] crabs, int alignPosition, int min) {
+        var totalCost = 0;
+        for (int i = 0; i < crabs.length; i++) {
+            var dist = Math.abs(crabs[i] - alignPosition);
+            totalCost += (dist * (dist + 1)) / 2;
+            if (totalCost >= min) {
                 return Integer.MAX_VALUE;
             }
         }
@@ -32,6 +48,17 @@ public class Day7 {
         int min = Integer.MAX_VALUE;
         for (int i = 0; i < crabs.length; i++) {
             var cost = calculateFuelCost(crabs, i, min);
+            if (cost < min) {
+                min = cost;
+            }
+        }
+        return min;
+    }
+
+    static int findBestAlignmentRevised(int[] crabs) {
+        int min = Integer.MAX_VALUE;
+        for (int i = 0; i < crabs.length; i++) {
+            var cost = calculateFuelCostRevised(crabs, i, min);
             if (cost < min) {
                 min = cost;
             }
