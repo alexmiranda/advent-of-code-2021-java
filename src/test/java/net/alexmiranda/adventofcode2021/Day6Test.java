@@ -9,13 +9,22 @@ public class Day6Test {
 
     @Test
     public void testExamplePart1() {
+        assertEquals(5, Day6.part1("3,4,3,1,2", 1));
+        assertEquals(6, Day6.part1("3,4,3,1,2", 2));
+        assertEquals(7, Day6.part1("3,4,3,1,2", 3));
         assertEquals(26, Day6.part1("3,4,3,1,2", 18));
         assertEquals(5934, Day6.part1("3,4,3,1,2", 80));
+        assertEquals(26984457539L, Day6.part1("3,4,3,1,2", 256));
     }
 
     @Test
     public void testInputPart1() {
         assertEquals(395627, Day6.part1(input, 80));
+    }
+
+    @Test
+    public void testInputPart2() {
+        assertEquals(1767323539209L, Day6.part1(input, 256));
     }
 
 }
