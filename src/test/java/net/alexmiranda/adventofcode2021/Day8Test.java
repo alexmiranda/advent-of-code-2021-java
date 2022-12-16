@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.StringReader;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 public class Day8Test {
     private static final String EXAMPLE = """
@@ -31,5 +33,26 @@ public class Day8Test {
     @Test
     public void testPuzzleInputPart1() throws IOException {
         assertEquals(392, Day8.countUniqueDigitsOccurrence());
+    }
+
+    @Test
+    public void testExamplePart2() throws IOException {
+        try (var reader = new StringReader(EXAMPLE)) {
+            assertEquals(61229, Day8.sumOutputValues(reader));
+        }
+    }
+
+    @Test
+    public void testPuzzleInputPart2() throws IOException {
+        assertEquals(1004688, Day8.sumOutputValues());
+    }
+
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+                'acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf', 5353
+                'be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb | fdgacbe cefdb cefbgd gcbe', 8394
+            """)
+    public void testDecodeOutput(String s, int displayNumber) {
+        assertEquals(displayNumber, Day8.decodeOutput(s));
     }
 }
