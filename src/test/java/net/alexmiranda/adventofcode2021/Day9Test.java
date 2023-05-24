@@ -20,16 +20,30 @@ public class Day9Test {
             """;
 
     @Test
-    public void testExamplePart1() {
+    public void testExamplePart1() throws IOException {
         try (var reader = new StringReader(EXAMPLE)) {
-            assertEquals(15, Day9.findLowPoints(reader));
+            assertEquals(15, Day9.calculateRiskLevel(reader));
         }
     }
 
     @Test
     public void testPuzzleInputPart1() throws IOException {
         try (var reader = new InputStreamReader(Objects.requireNonNull(Day9Test.class.getResourceAsStream(INPUT)))) {
-            assertEquals(572, Day9.findLowPoints(reader));
+            assertEquals(572, Day9.calculateRiskLevel(reader));
+        }
+    }
+
+    @Test
+    public void testExamplePart2() throws IOException {
+        try (var reader = new StringReader(EXAMPLE)) {
+            assertEquals(1134, Day9.findLargestBasins(reader));
+        }
+    }
+
+    @Test
+    public void testPuzzleInputPart2() throws IOException {
+        try (var reader = new InputStreamReader(Objects.requireNonNull(Day9Test.class.getResourceAsStream(INPUT)))) {
+            assertEquals(847044, Day9.findLargestBasins(reader));
         }
     }
 }
