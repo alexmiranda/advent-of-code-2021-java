@@ -33,8 +33,22 @@ public class Day10Test {
 
     @Test
     public void testPuzzleInputPart1() throws IOException {
-        try (var reader = new InputStreamReader(Objects.requireNonNull(Day9Test.class.getResourceAsStream(INPUT)))) {
+        try (var reader = new InputStreamReader(Objects.requireNonNull(Day10Test.class.getResourceAsStream(INPUT)))) {
             assertEquals(366027, Day10.calculateSyntaxErrorScore(reader));
+        }
+    }
+
+    @Test
+    public void testExamplePart2() {
+        try (var reader = new StringReader(EXAMPLE)) {
+            assertEquals(288957, Day10.calculateAutoCompleteScore(reader));
+        }
+    }
+
+    @Test
+    public void testPuzzleInputPart2() throws IOException {
+        try (var reader = new InputStreamReader(Objects.requireNonNull(Day10Test.class.getResourceAsStream(INPUT)))) {
+            assertEquals(1118645287, Day10.calculateAutoCompleteScore(reader));
         }
     }
 }
