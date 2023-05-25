@@ -28,16 +28,16 @@ public class Day12 {
             this.id = id;
         }
 
-        public int discover() {
-            return discover(new HashSet<>());
+        public int discover(boolean visitSmallCaveTwice) {
+            return discover(new HashSet<>(), visitSmallCaveTwice);
         }
 
-        protected int discover(HashSet<String> visited) {
+        protected int discover(HashSet<String> visited, boolean visitSmallCaveTwice) {
             int paths = 0;
             visited = new HashSet<>(visited);
             visited.add(this.id);
             for (var cave : this.links) {
-                paths += cave.discover(visited);
+                paths += cave.discover(visited, visitSmallCaveTwice);
             }
             return paths;
         }
@@ -67,9 +67,9 @@ public class Day12 {
         }
 
         @Override
-        protected int discover(HashSet<String> visited) {
+        protected int discover(HashSet<String> visited, boolean visitSmallCaveTwice) {
             if (!visited.isEmpty()) return 0;
-            return super.discover(visited);
+            return super.discover(visited, visitSmallCaveTwice);
         }
     }
 
@@ -79,7 +79,7 @@ public class Day12 {
         }
 
         @Override
-        protected int discover(HashSet<String> visited) {
+        protected int discover(HashSet<String> visited, boolean visitSmallCaveTwice) {
             return 1;
         }
     }
@@ -96,9 +96,11 @@ public class Day12 {
         }
 
         @Override
-        protected int discover(HashSet<String> visited) {
-            if (visited.contains(this.id)) return 0;
-            return super.discover(visited);
+        protected int discover(HashSet<String> visited, boolean visitSmallCaveTwice) {
+            if (visited.contains(this.id)) {
+                return visitSmallCaveTwice ? super.discover(visited, false) : 0;
+            };
+            return super.discover(visited, visitSmallCaveTwice);
         }
     }
 

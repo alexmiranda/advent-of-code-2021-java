@@ -61,26 +61,50 @@ public class Day12Test {
             """;
 
     @ParameterizedTest
-    @MethodSource("examples")
+    @MethodSource("examplesPart1")
     public void testExamplePart1(String example, int expected) {
         var reader = new StringReader(example);
         var start = Day12.readInput(reader);
-        assertEquals(expected, start.discover());
+        assertEquals(expected, start.discover(false));
     }
 
     @Test
     public void testPuzzleInputPart1() throws IOException {
         try (var reader = new InputStreamReader(Objects.requireNonNull(Day12.class.getResourceAsStream(INPUT)))) {
             var start = Day12.readInput(reader);
-            assertEquals(3887, start.discover());
+            assertEquals(3887, start.discover(false));
         }
     }
 
-    static Stream<Arguments> examples() {
+    @ParameterizedTest
+    @MethodSource("examplesPart2")
+    public void testExamplePart2(String example, int expected) {
+        var reader = new StringReader(example);
+        var start = Day12.readInput(reader);
+        assertEquals(expected, start.discover(true));
+    }
+
+    @Test
+    public void testPuzzleInputPart2() throws IOException {
+        try (var reader = new InputStreamReader(Objects.requireNonNull(Day12.class.getResourceAsStream(INPUT)))) {
+            var start = Day12.readInput(reader);
+            assertEquals(104834, start.discover(true));
+        }
+    }
+
+    static Stream<Arguments> examplesPart1() {
         return Stream.of(
                 Arguments.of(EXAMPLE_1, 10),
                 Arguments.of(EXAMPLE_2, 19),
                 Arguments.of(EXAMPLE_3, 226)
+        );
+    }
+
+    static Stream<Arguments> examplesPart2() {
+        return Stream.of(
+                Arguments.of(EXAMPLE_1, 36),
+                Arguments.of(EXAMPLE_2, 103),
+                Arguments.of(EXAMPLE_3, 3509)
         );
     }
 }
