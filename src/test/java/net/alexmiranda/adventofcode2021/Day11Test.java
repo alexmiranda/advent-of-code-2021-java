@@ -4,12 +4,14 @@ import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.util.Objects;
+import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class Day11Test {
     private static final String INPUT = "/2021/Day/11/input";
+    private static final String TEST_SCRIPT = "/2021/Day/11/testscript.txt";
 
     private static final String EXAMPLE = """
             5483143223
@@ -22,32 +24,6 @@ public class Day11Test {
             6882881134
             4846848554
             5283751526
-            """;
-
-    private static final String EXAMPLE_AFTER_1_STEP = """
-            6594254334
-            3856965822
-            6375667284
-            7252447257
-            7468496589
-            5278635756
-            3287952832
-            7993992245
-            5957959665
-            6394862637
-            """;
-
-    private static final String EXAMPLE_AFTER_2_STEPS = """
-            8807476555
-            5089087054
-            8597889608
-            8485769600
-            8700908800
-            6600088989
-            6800005943
-            0000007456
-            9000000876
-            8700006848
             """;
 
     @Test
@@ -65,16 +41,25 @@ public class Day11Test {
     }
 
     @Test
-    public void testExampleStepsPart1() {
-        var octopodes = Day11.readInput(new StringReader(EXAMPLE));
-        var after1 = Day11.readInput(new StringReader(EXAMPLE_AFTER_1_STEP));
-        var after2 = Day11.readInput(new StringReader(EXAMPLE_AFTER_2_STEPS));
+    public void testExampleStepsPart1() throws IOException {
+        try (var reader = new InputStreamReader(Objects.requireNonNull(Day11Test.class.getResourceAsStream(TEST_SCRIPT)));
+             var scanner = new Scanner(reader)) {
+            scanner.useDelimiter("");
+            scanner.nextLine();
 
-        assertEquals(0, Day11.simulate(octopodes, 1));
-        assertArrayEquals(after1, octopodes);
-
-        assertEquals(35, Day11.simulate(octopodes, 1));
-        assertArrayEquals(after2, octopodes);
+            int step = 0, prevStep = 0;
+            var octopodes = Day11.readInput(scanner);
+            while (scanner.hasNext()) {
+                scanner.nextLine(); // discard empty line
+                var line = scanner.nextLine(); // After step N...
+                assert line.startsWith("After");
+                step = Integer.parseInt(line.substring(line.lastIndexOf(' ') + 1, line.length() - 1));
+                var expected = Day11.readInput(scanner);
+                Day11.simulate(octopodes, step - prevStep);
+                assertArrayEquals(expected, octopodes);
+                prevStep = step;
+            }
+        }
     }
 
     @Test

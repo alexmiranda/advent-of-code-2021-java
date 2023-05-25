@@ -6,15 +6,21 @@ import java.util.*;
 
 public class Day11 {
     public static byte[] readInput(Reader reader) {
-        var octopodes = new byte[100];
         try (var scanner = new Scanner(reader)) {
             scanner.useDelimiter("");
-            for (int i = 0; i < 10; i++) {
-                for (int j = 0; j < 10; j++) {
-                    octopodes[i * 10 + j] = (byte) scanner.nextInt();
-                }
-                scanner.nextLine();
+            var octopodes = readInput(scanner);
+            assert !scanner.hasNext();
+            return octopodes;
+        }
+    }
+
+    static byte[] readInput(Scanner scanner) {
+        var octopodes = new byte[100];
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                octopodes[i * 10 + j] = (byte) scanner.nextInt();
             }
+            scanner.nextLine();
         }
         return octopodes;
     }
