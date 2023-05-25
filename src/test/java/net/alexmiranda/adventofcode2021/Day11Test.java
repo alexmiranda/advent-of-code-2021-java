@@ -41,13 +41,27 @@ public class Day11Test {
     }
 
     @Test
+    public void testExamplePart2() {
+        var octopodes = Day11.readInput(new StringReader(EXAMPLE));
+        assertEquals(195, Day11.simulate(octopodes));
+    }
+
+    @Test
+    public void testPuzzleInputPart2() throws IOException {
+        try (var reader = new InputStreamReader(Objects.requireNonNull(Day11Test.class.getResourceAsStream(INPUT)))) {
+            var octopodes = Day11.readInput(reader);
+            assertEquals(488, Day11.simulate(octopodes));
+        }
+    }
+
+    @Test
     public void testExampleStepsPart1() throws IOException {
         try (var reader = new InputStreamReader(Objects.requireNonNull(Day11Test.class.getResourceAsStream(TEST_SCRIPT)));
              var scanner = new Scanner(reader)) {
             scanner.useDelimiter("");
             scanner.nextLine();
 
-            int step = 0, prevStep = 0;
+            int step, prevStep = 0;
             var octopodes = Day11.readInput(scanner);
             while (scanner.hasNext()) {
                 scanner.nextLine(); // discard empty line

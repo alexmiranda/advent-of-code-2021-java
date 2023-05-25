@@ -14,7 +14,7 @@ public class Day11 {
         }
     }
 
-    static byte[] readInput(Scanner scanner) {
+    public static byte[] readInput(Scanner scanner) {
         var octopodes = new byte[100];
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
@@ -25,9 +25,26 @@ public class Day11 {
         return octopodes;
     }
 
+    /**
+     * Returns the number of flashes until turn given by {@code turn}.
+     */
     public static int simulate(byte[] octopodes, int turns) {
         var maxxed = new ArrayDeque<Integer>(100);
         return simulate(octopodes, maxxed, turns, 0);
+    }
+
+    /**
+     * Returns the number of turns it takes until every octopus flashes simultaneously.
+     */
+    public static int simulate(byte[] octopodes) {
+        var maxxed = new ArrayDeque<Integer>(100);
+        int i = 0;
+        while (true) {
+            i++;
+            if (simulate(octopodes, maxxed, 1, 0) == 100) {
+                return i;
+            }
+        }
     }
 
     private static int simulate(byte[] octopodes, Deque<Integer> maxxed, int turnsLeft, int counter) {
