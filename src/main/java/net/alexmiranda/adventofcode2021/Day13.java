@@ -1,6 +1,8 @@
 package net.alexmiranda.adventofcode2021;
 
+import java.io.IOException;
 import java.io.Reader;
+import java.io.Writer;
 import java.util.*;
 
 public class Day13 {
@@ -13,8 +15,8 @@ public class Day13 {
         record FoldLeft(int position) implements Fold {}
 
         private final ArrayDeque<Fold> instructions;
-        private NavigableMap<Integer, NavigableSet<Integer>> coords;
-        private int width;
+        NavigableMap<Integer, NavigableSet<Integer>> coords;
+        int width;
 
         public TransparentOrigami(Reader reader) {
             this.coords = new TreeMap<>();
@@ -89,6 +91,22 @@ public class Day13 {
                 sum += row.size();
             }
             return sum;
+        }
+
+        public void print(Writer w) throws IOException {
+            int height = this.coords.lastKey();
+            for (int i = 0; i <= height; i++) {
+                var line = this.coords.getOrDefault(i, Collections.emptyNavigableSet());
+                int prev = 0;
+                for (var pos : line) {
+                    var spaces = ".".repeat(pos - prev);
+                    w.write(spaces);
+                    w.write('#');
+                    prev = pos + 1;
+                }
+                w.write(".".repeat(width - prev + 1));
+                w.write('\n');
+            }
         }
 
         private void foldUp(int y) {
