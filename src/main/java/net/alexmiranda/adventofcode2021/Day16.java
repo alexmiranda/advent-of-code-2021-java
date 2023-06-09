@@ -6,39 +6,199 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class Day16 {
-    public static class Packet {
-        private static final int TYPE_LITERAL = 4;
+    public sealed interface Packet permits LiteralPacket, OperationPacket {
+        int TYPE_SUM = 0;
+        int TYPE_PROD = 1;
+        int TYPE_MIN = 2;
+        int TYPE_MAX = 3;
+        int TYPE_LIT = 4;
+        int TYPE_GT = 5;
+        int TYPE_LT = 6;
+        int TYPE_EQ = 7;
 
-        private int version;
-        private int type;
-        private boolean lengthTypeId;
-        private long literalValue;
-        private final ArrayList<Packet> subpackets = new ArrayList<>(3);
+        long value();
+    }
 
-        public int version() {
-            return this.version;
+    public static final class LiteralPacket implements Packet {
+        private final int version;
+        private final long literalValue;
+
+        public LiteralPacket(int version, long literalValue) {
+            this.version = version;
+            this.literalValue = literalValue;
         }
 
-        public int type() {
-            return this.type;
-        }
-
-        public long literalValue() {
+        @Override
+        public long value() {
             return this.literalValue;
         }
+    }
 
-        public int sumOfVersionNumbers() {
-            int sum = this.version;
-            for (var subpacket : this.subpackets) {
-                sum += subpacket.sumOfVersionNumbers();
-            }
-            return sum;
+    public static sealed abstract class OperationPacket implements Packet {
+        private final int version;
+        protected final ArrayList<Packet> subpackets = new ArrayList<>(2);
+
+        protected OperationPacket(int version) {
+            this.version = version;
         }
 
-        public boolean isLiteral() {
-            return this.type == TYPE_LITERAL;
+        abstract void addSubpacket(Packet packet);
+    }
+
+    public static final class SumPacket extends OperationPacket {
+        private long sum = 0;
+
+        private SumPacket(int version) {
+            super(version);
+        }
+
+        @Override
+        public long value() {
+            return this.sum;
+        }
+
+        @Override
+        void addSubpacket(Packet packet) {
+            this.subpackets.add(packet);
+            this.sum = Math.addExact(this.sum, packet.value());
         }
     }
+
+    public static final class ProductPacket extends OperationPacket {
+        private long product = 1;
+
+        private ProductPacket(int version) {
+            super(version);
+        }
+
+        @Override
+        public long value() {
+            return this.product;
+        }
+
+        @Override
+        void addSubpacket(Packet packet) {
+            this.subpackets.add(packet);
+            this.product = Math.multiplyExact(this.product, packet.value());
+        }
+    }
+
+    public static final class MinPacket extends OperationPacket {
+        private long min = 0;
+
+        private MinPacket(int version) {
+            super(version);
+        }
+
+        @Override
+        public long value() {
+            return this.min;
+        }
+
+        @Override
+        void addSubpacket(Packet packet) {
+            this.subpackets.add(packet);
+            long val = packet.value();
+            if (this.subpackets.size() == 1 || val < this.min) {
+                this.min = val;
+            }
+        }
+    }
+
+    public static final class MaxPacket extends OperationPacket {
+        private long max = 0;
+
+        private MaxPacket(int version) {
+            super(version);
+        }
+
+        @Override
+        public long value() {
+            return this.max;
+        }
+
+        @Override
+        void addSubpacket(Packet packet) {
+            this.subpackets.add(packet);
+            long val = packet.value();
+            if (this.subpackets.size() == 1 || val > this.max) {
+                this.max = val;
+            }
+        }
+    }
+
+    public static final class GreaterThanPacket extends OperationPacket {
+        private boolean gt = false;
+
+        private GreaterThanPacket(int version) {
+            super(version);
+        }
+
+        @Override
+        public long value() {
+            return this.gt ? 1L : 0L;
+        }
+
+        @Override
+        void addSubpacket(Packet packet) {
+            assert this.subpackets.size() <= 1;
+            this.subpackets.add(packet);
+            if (this.subpackets.size() > 1) {
+                long lhs = this.subpackets.get(0).value();
+                long rhs = packet.value();
+                this.gt = lhs > rhs;
+            }
+        }
+    }
+
+    public static final class LessThanPacket extends OperationPacket {
+        private boolean lt = false;
+
+        private LessThanPacket(int version) {
+            super(version);
+        }
+
+        @Override
+        public long value() {
+            return this.lt ? 1L : 0L;
+        }
+
+        @Override
+        void addSubpacket(Packet packet) {
+            assert this.subpackets.size() <= 1;
+            this.subpackets.add(packet);
+            if (this.subpackets.size() > 1) {
+                long lhs = this.subpackets.get(0).value();
+                long rhs = packet.value();
+                this.lt = lhs < rhs;
+            }
+        }
+    }
+
+    public static final class EqualPacket extends OperationPacket {
+        private boolean eq = false;
+
+        private EqualPacket(int version) {
+            super(version);
+        }
+
+        @Override
+        public long value() {
+            return this.eq ? 1L : 0L;
+        }
+
+        @Override
+        void addSubpacket(Packet packet) {
+            assert this.subpackets.size() <= 1;
+            this.subpackets.add(packet);
+            if (this.subpackets.size() > 1) {
+                long lhs = this.subpackets.get(0).value();
+                long rhs = packet.value();
+                this.eq = lhs == rhs;
+            }
+        }
+    }
+
 
     private static class PacketDecoder implements AutoCloseable {
         private final HexToBinaryTransformer reader;
@@ -54,33 +214,50 @@ public class Day16 {
         }
 
         private Packet decode(char[] buf) throws IOException {
-            var packet = new Packet();
-            packet.version = readInt(buf, 3);
-            packet.type = readInt(buf, 3);
+            int version = readInt(buf, 3);
+            int type = readInt(buf, 3);
 
             // literal packet
-            if (packet.isLiteral()) {
-                packet.literalValue = readLiteral(buf);
-                return packet;
+            if (isLiteral(type)) {
+                long literalValue = readLiteral(buf);
+                return new LiteralPacket(version, literalValue);
             }
 
             // operator packet
-            packet.lengthTypeId = readBoolean(buf);
-            if (packet.lengthTypeId) {
+            var operatorPacket = createOperatorPacket(version, type);
+            boolean lengthTypeId = readBoolean(buf);
+            if (lengthTypeId) {
                 int subpacketCount = readInt(buf, 11);
-                packet.subpackets.ensureCapacity(subpacketCount);
+                operatorPacket.subpackets.ensureCapacity(subpacketCount);
                 for (int i = 0; i < subpacketCount; i++) {
-                    packet.subpackets.add(this.decode(buf));
+                    operatorPacket.addSubpacket(this.decode(buf));
                 }
             } else {
                 int subpacketsLength = readInt(buf, 15);
                 int start = this.read;
                 while (this.read < start + subpacketsLength) {
-                    packet.subpackets.add(this.decode(buf));
+                    operatorPacket.addSubpacket(this.decode(buf));
                 }
             }
 
-            return packet;
+            return operatorPacket;
+        }
+
+        private boolean isLiteral(int type) {
+            return type == Packet.TYPE_LIT;
+        }
+
+        private OperationPacket createOperatorPacket(int version, int type) {
+            return switch (type) {
+                case Packet.TYPE_SUM -> new SumPacket(version);
+                case Packet.TYPE_PROD -> new ProductPacket(version);
+                case Packet.TYPE_MIN -> new MinPacket(version);
+                case Packet.TYPE_MAX -> new MaxPacket(version);
+                case Packet.TYPE_GT -> new GreaterThanPacket(version);
+                case Packet.TYPE_LT -> new LessThanPacket(version);
+                case Packet.TYPE_EQ -> new EqualPacket(version);
+                default -> throw new IllegalStateException("Unexpected packet type: " + type);
+            };
         }
 
         private long readLiteral(char[] buf) throws IOException {
@@ -206,4 +383,16 @@ public class Day16 {
         }
     }
 
+    public static int sumOfVersionNumbers(Packet packet) {
+        return switch (packet) {
+            case LiteralPacket lit -> lit.version;
+            case OperationPacket op -> {
+                int sum = op.version;
+                for (var subpacket : op.subpackets) {
+                    sum += sumOfVersionNumbers(subpacket);
+                }
+                yield sum;
+            }
+        };
+    }
 }

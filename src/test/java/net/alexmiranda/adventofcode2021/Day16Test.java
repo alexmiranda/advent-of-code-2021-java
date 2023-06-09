@@ -9,7 +9,6 @@ import java.io.StringReader;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class Day16Test {
     private static final String INPUT = "/2021/Day/16/input";
@@ -24,23 +23,40 @@ public class Day16Test {
             """)
     public void testExamplePart1(String s, int sum) throws Exception {
         var reader = new StringReader(s);
-        assertEquals(sum, Day16.decode(reader).sumOfVersionNumbers());
+        var packet = Day16.decode(reader);
+        assertEquals(sum, Day16.sumOfVersionNumbers(packet));
     }
 
     @Test
     public void testPuzzleInputPart1() throws Exception {
         try (var reader = new InputStreamReader(Objects.requireNonNull(Day16Test.class.getResourceAsStream(INPUT)))) {
-            assertEquals(854, Day16.decode(reader).sumOfVersionNumbers());
+            var packet = Day16.decode(reader);
+            assertEquals(854, Day16.sumOfVersionNumbers(packet));
         }
     }
 
-    @Test
-    public void testExampleDecodePart1() throws Exception {
-        var reader = new StringReader("D2FE28");
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+            'C200B40A82',3
+            '04005AC33890',54
+            '880086C3E88112',7
+            'CE00C43D881120',9
+            'D8005AC2A8F0',1
+            'F600BC2D8F',0
+            '9C005AC2F8F0',0
+            '9C0141080250320F1802104A08',1
+            """)
+    public void testExamplePart2(String s, long value) throws Exception {
+        var reader = new StringReader(s);
         var packet = Day16.decode(reader);
-        assertEquals(6, packet.version());
-        assertEquals(4, packet.type());
-        assertTrue(packet.isLiteral());
-        assertEquals(2021, packet.literalValue());
+        assertEquals(value, packet.value());
+    }
+
+    @Test
+    public void testPuzzleInputPart2() throws Exception {
+        try (var reader = new InputStreamReader(Objects.requireNonNull(Day16Test.class.getResourceAsStream(INPUT)))) {
+            var packet = Day16.decode(reader);
+            assertEquals(186_189_840_660L, packet.value());
+        }
     }
 }
