@@ -1,0 +1,2 @@
+src/main/resources/**/instructions.txt filter=git-crypt diff=git-crypt
+src/main/resources/**/input filter=git-crypt diff=git-crypt
