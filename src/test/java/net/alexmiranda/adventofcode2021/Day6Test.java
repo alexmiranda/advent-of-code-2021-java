@@ -4,8 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
+
 public class Day6Test {
-    private static final String input = "1,1,1,2,1,1,2,1,1,1,5,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,4,1,1,1,1,3,1,1,3,1,1,1,4,1,5,1,3,1,1,1,1,1,5,1,1,1,1,1,5,5,2,5,1,1,2,1,1,1,1,3,4,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,5,4,1,1,1,1,1,5,1,2,4,1,1,1,1,1,3,3,2,1,1,4,1,1,5,5,1,1,1,1,1,2,5,1,4,1,1,1,1,1,1,2,1,1,5,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,4,3,1,1,3,1,3,1,4,1,5,4,1,1,2,1,1,5,1,1,1,1,1,5,1,1,1,1,1,1,1,1,1,4,1,1,4,1,1,1,1,1,1,1,5,4,1,2,1,1,1,1,1,1,1,1,1,1,1,3,1,1,1,1,1,1,1,1,1,1,4,1,1,1,2,1,4,1,1,1,1,1,1,1,1,1,4,2,1,2,1,1,4,1,1,1,1,1,1,3,1,1,1,1,1,1,1,1,3,2,1,4,1,5,1,1,1,4,5,1,1,1,1,1,1,5,1,1,5,1,2,1,1,2,4,1,1,2,1,5,5,3";
+    private static final String INPUT = "/2021/Day/6/input";
 
     @Test
     public void testExamplePart1() {
@@ -18,13 +22,19 @@ public class Day6Test {
     }
 
     @Test
-    public void testInputPart1() {
-        assertEquals(395627, Day6.part1(input, 80));
+    public void testInputPart1() throws IOException {
+        assertEquals(395627, Day6.part1(readInputFile(), 80));
     }
 
     @Test
-    public void testInputPart2() {
-        assertEquals(1767323539209L, Day6.part1(input, 256));
+    public void testInputPart2() throws IOException {
+        assertEquals(1767323539209L, Day6.part1(readInputFile(), 256));
     }
 
+    private static String readInputFile() throws IOException {
+        try (var is = Day6Test.class.getResourceAsStream(INPUT)) {
+            var bytes = Objects.requireNonNull(is).readAllBytes();
+            return new String(bytes, StandardCharsets.UTF_8).stripTrailing();
+        }
+    }
 }
