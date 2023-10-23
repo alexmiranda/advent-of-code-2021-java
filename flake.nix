@@ -20,7 +20,7 @@
           default = devenv.lib.mkShell {
             inherit inputs pkgs;
             modules = [{
-              packages = with pkgs; [ jdk17_headless nixfmt ];
+              packages = with pkgs; [ git-crypt jdk17_headless nixfmt ];
 
               enterShell = ''
                 ${pkgs.cowsay}/bin/cowsay -f small -e oO Advent of Code 2021 | ${pkgs.lolcat}/bin/lolcat
