@@ -19,7 +19,9 @@ public class Day17 {
         }
     }
 
-    static int calculateTrajectory(Target target) {
+    record Trajectory(int highestY, int totalPossibleHits) {}
+
+    static Trajectory calculateTrajectory(Target target) {
         final int minX = Math.min(target.x1, target.x2);
         final int maxX = Math.max(target.x1, target.x2);
         final int minY = Math.min(target.y1, target.y2);
@@ -34,10 +36,10 @@ public class Day17 {
         final int maxVelocityX = maxX;
 
         final int maxVelocityY = Math.abs(minY);
-        int answer = 0;
+        int highestY = Integer.MIN_VALUE;
+        int totalPossibleHits = 0;
 
-        // TODO: is it always min initial velocity y = 1? This assumes maxY < 0
-        for (int initialVelocityY = 1; initialVelocityY <= maxVelocityY; initialVelocityY++) {
+        for (int initialVelocityY = minY; initialVelocityY <= maxVelocityY; initialVelocityY++) {
             for (int initialVelocityX = minVelocityX; initialVelocityX <= maxVelocityX; initialVelocityX++) {
                 boolean hasHitTarget = false;
                 int x = 0, y = 0, vx = initialVelocityX, vy = initialVelocityY, hy = 0;
@@ -54,12 +56,13 @@ public class Day17 {
                     hy = Math.max(y, hy);
                 }
 
-                if (hasHitTarget && hy > answer) {
-                    answer = hy;
+                if (hasHitTarget) {
+                    totalPossibleHits++;
+                    highestY = Math.max(highestY, hy);
                 }
             }
         }
 
-        return answer;
+        return new Trajectory(highestY, totalPossibleHits);
     }
 }

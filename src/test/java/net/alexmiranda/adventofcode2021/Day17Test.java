@@ -14,14 +14,32 @@ public class Day17Test {
     @Test
     public void testExamplePart1() {
         var target = Day17.Target.from(EXAMPLE);
-        assertEquals(45, Day17.calculateTrajectory(target));
+        var trajectory = Day17.calculateTrajectory(target);
+        assertEquals(45, trajectory.highestY());
     }
 
     @Test
     public void testPuzzleInputPart1() throws Exception {
         try (var is = Objects.requireNonNull(Day17Test.class.getResourceAsStream(INPUT))) {
             var target = Day17.Target.from(new String(is.readAllBytes(), StandardCharsets.UTF_8).stripTrailing());
-            assertEquals(3916, Day17.calculateTrajectory(target));
+            var trajectory = Day17.calculateTrajectory(target);
+            assertEquals(3916, trajectory.highestY());
+        }
+    }
+
+    @Test
+    public void testExamplePart2() {
+        var target = Day17.Target.from(EXAMPLE);
+        var trajectory = Day17.calculateTrajectory(target);
+        assertEquals(112, trajectory.totalPossibleHits());
+    }
+
+    @Test
+    public void testPuzzleInputPart2() throws Exception {
+        try (var is = Objects.requireNonNull(Day17Test.class.getResourceAsStream(INPUT))) {
+            var target = Day17.Target.from(new String(is.readAllBytes(), StandardCharsets.UTF_8).stripTrailing());
+            var trajectory = Day17.calculateTrajectory(target);
+            assertEquals(2986, trajectory.totalPossibleHits());
         }
     }
 }
