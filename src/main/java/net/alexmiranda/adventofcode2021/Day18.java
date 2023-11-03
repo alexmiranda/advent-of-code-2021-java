@@ -90,6 +90,41 @@ public class Day18 {
             return state == null ? null : state.pair;
         }
 
+        static List<SnailfishNumber> parseAll(Reader reader) throws IOException {
+            var list = new ArrayList<SnailfishNumber>(100);
+            SnailfishNumber number = null;
+            while ((number = parse(reader)) != null) {
+                list.add(number);
+            }
+            return list;
+        }
+
+        static int findLargestMagnitude(List<SnailfishNumber> list) throws IOException {
+            int max = Integer.MIN_VALUE;
+            assert list.size() > 1;
+            for (int i = 0; i < list.size() - 1; i++) {
+                for (int j = i + 1; j < list.size(); j++) {
+                    var a = list.get(i);
+                    var b = list.get(j);
+                    max = Math.max(max, sum(a, b, max));
+                    max = Math.max(max, sum(b, a, max));
+                }
+            }
+            return max;
+        }
+
+        static int sum(SnailfishNumber lhs, SnailfishNumber rhs, int max) throws IOException {
+            lhs = clone(lhs);
+            rhs = clone(rhs);
+            var sum = lhs.add(rhs);
+            return Math.max(max, sum.magnitude());
+        }
+
+        private static SnailfishNumber clone(SnailfishNumber number) throws IOException {
+            // I know, I know... don't want to write a proper clone because it's tricky
+            return parse(number.toString());
+        }
+
         public SnailfishNumber add(SnailfishNumber right) {
             var pair = new Pair(this, right);
             this.parent = pair;
@@ -105,7 +140,7 @@ public class Day18 {
             record Node(SnailfishNumber elem, int depth) {
             }
 
-            var stack = new ArrayDeque<Node>();
+            var stack = new ArrayDeque<Node>(5);
             stack.push(new Node(root, 0));
 
             Pair found = null;
@@ -201,13 +236,6 @@ public class Day18 {
             return needToSplit;
         }
 
-//        private static void add(Regular regular, int value) {
-//            regular.value += value;
-//            if (regular.value >= 10) {
-//                split(regular);
-//            }
-//        }
-
         private static Pair split(Regular regular) {
             var leftVal = regular.value / 2;
             var rightVal = regular.value - leftVal;
@@ -220,10 +248,6 @@ public class Day18 {
                 regular.parent.right = pair;
             }
             return pair;
-        }
-
-        private static Pair root(SnailfishNumber number) {
-            return number.parent == null ? (Pair) number : root(number.parent);
         }
 
         abstract int magnitude();
@@ -269,20 +293,6 @@ public class Day18 {
         @Override
         public String toString() {
             return Integer.toString(this.value);
-        }
-    }
-
-    public static void main(String[] args) {
-        try (var reader = new StringReader("[[[[4,3],4],4],[7,[[8,4],9]]]\n[1,1]")) {
-            try {
-                var a = SnailfishNumber.parse(reader);
-                var b = SnailfishNumber.parse(reader);
-                System.out.println(a);
-                System.out.println(b);
-                System.out.println(a.add(b));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 }

@@ -3,6 +3,7 @@ package net.alexmiranda.adventofcode2021;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.InputStreamReader;
@@ -71,6 +72,19 @@ public class Day18Test {
             }
             assertEquals("[[[[7,7],[7,7]],[[7,0],[7,7]]],[[[8,8],[8,7]],[[7,8],[7,8]]]]", a.toString());
             assertEquals(4289, a.magnitude());
+        }
+    }
+
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+        'sample5',3993
+        'input',4807
+        """)
+    public void testPart2(String resource, int largestMagnitude) throws Exception {
+        String exampleFile = "/2021/day/18/" + resource;
+        try (var reader = new InputStreamReader(Objects.requireNonNull(Day18Test.class.getResourceAsStream(exampleFile)))) {
+            var numbers = Day18.SnailfishNumber.parseAll(reader);
+            assertEquals(largestMagnitude, Day18.SnailfishNumber.findLargestMagnitude(numbers));
         }
     }
 }
