@@ -25,6 +25,15 @@ public class Day18 {
         }
 
         static SnailfishNumber parse(Reader reader) throws IOException {
+            class State {
+                final Pair pair;
+                boolean isLeft = true;
+
+                State(Pair pair) {
+                    this.pair = pair;
+                }
+            }
+
             Deque<State> stack = new ArrayDeque<>(4);
             State state = null;
 
@@ -128,36 +137,76 @@ public class Day18 {
                 }
             }
 
-            if (found == null) {
+            var needToSplit = false;
+            if (found != null) {
+                // explode the pair and determine if we need to split, i.e. nearest left or right have value >= 10
+                needToSplit = explode(found, nearestLeft, nearestRight);
+                root = reduce(root);
+            }
+
+            // if we know there is nothing to split, we simply return the root node
+            if (!needToSplit) {
                 return root;
             }
 
-            explode(found, nearestLeft, nearestRight);
-            return reduce(root);
+            // search for numbers to split
+            stack.add(new Node(root, 0));
+            while (!stack.isEmpty()) {
+                var node = stack.pop();
+                switch (node.elem) {
+                    case Pair pair -> {
+                        // push right before left to ensure correct iteration order
+                        stack.push(new Node(pair.right, node.depth + 1));
+                        stack.push(new Node(pair.left, node.depth + 1));
+                    }
+                    case Regular regular -> {
+                        if (regular.value >= 10) {
+                            split(regular);
+
+                            // if split causes the pair to explode, we reduce it first
+                            if (node.depth >= 4) {
+                                root = reduce(root);
+                            }
+
+                            // start over at root
+                            stack.clear();
+                            stack.add(new Node(root, 0));
+                        }
+                    }
+                }
+            }
+
+            // we're done: all explodes and splits are complete
+            return root;
         }
 
-        private static void explode(Pair pair, Regular nearestLeft, Regular nearestRight) {
+        private static boolean explode(Pair pair, Regular nearestLeft, Regular nearestRight) {
             if (pair.isLeft) {
                 pair.parent.left = new Regular(pair.parent, true, 0);
             } else {
                 pair.parent.right = new Regular(pair.parent, false, 0);
             }
 
+            var needToSplit = false;
             if (nearestLeft != null) {
-                add(nearestLeft, ((Regular) pair.left).value);
+                nearestLeft.value += ((Regular) pair.left).value;
+                needToSplit |= nearestLeft.value >= 10;
             }
 
             if (nearestRight != null) {
-                add(nearestRight, ((Regular) pair.right).value);
+                nearestRight.value += ((Regular) pair.right).value;
+                needToSplit |= nearestRight.value >= 10;
             }
+
+            return needToSplit;
         }
 
-        private static void add(Regular regular, int value) {
-            regular.value += value;
-            if (regular.value >= 10) {
-                split(regular);
-            }
-        }
+//        private static void add(Regular regular, int value) {
+//            regular.value += value;
+//            if (regular.value >= 10) {
+//                split(regular);
+//            }
+//        }
 
         private static Pair split(Regular regular) {
             var leftVal = regular.value / 2;
@@ -220,16 +269,6 @@ public class Day18 {
         @Override
         public String toString() {
             return Integer.toString(this.value);
-        }
-    }
-
-    static class State {
-        private final Pair pair;
-
-        private boolean isLeft = true;
-
-        private State(Pair pair) {
-            this.pair = pair;
         }
     }
 

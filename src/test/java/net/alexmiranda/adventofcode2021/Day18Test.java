@@ -69,7 +69,8 @@ public class Day18Test {
                 a = a.add(b);
                 b = Day18.SnailfishNumber.parse(reader);
             }
-            assertEquals("[0,0]", a.toString());
+            assertEquals("[[[[7,7],[7,7]],[[7,0],[7,7]]],[[[8,8],[8,7]],[[7,8],[7,8]]]]", a.toString());
+            assertEquals(4289, a.magnitude());
         }
     }
 }
